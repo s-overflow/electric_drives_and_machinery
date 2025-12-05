@@ -3,7 +3,7 @@
 % DCM-Parameter
 %
 
-fnames={'coast_stop_ie06A'       %  1, coast down with ie=0.6 A
+fnames={'coast_down_converter_off'       %  1, coast down with ie=0.6 A
         'resistance'     %  2, slow ramp |d(va)/dt|=2V/s, 21.75 V -> -21.75 V -> 0 V, ie=0 A, rotor is not locked
     
         
@@ -11,7 +11,7 @@ fnames={'coast_stop_ie06A'       %  1, coast down with ie=0.6 A
 %     
 %     
 %    
-wahl=2;
+wahl=1;
 
 fname=fnames{wahl};
 mw=load(fname);
