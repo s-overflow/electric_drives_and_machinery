@@ -76,8 +76,10 @@ ctrl.i.T = Ts*bi(1)/(bi(1)+bi(2));
 ctrl.i.kb = Ts/ctrl.i.T;
 
 % saturation for va
-ctrl.i.satP = 40;
-ctrl.i.satN = -40;
+% ctrl.i.satP = 40;
+% ctrl.i.satN = -40;
+ctrl.i.satP = 70;
+ctrl.i.satN = -70;
 %% Design speed controller
 % Omega-Va TF, setting TLoad as disturbance, neglecting kfric
 G_wv_s = ss(kPhi /(I*La*s^2 + Ra*I*s + (kPhi)^2));

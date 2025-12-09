@@ -80,15 +80,15 @@ for i = 1:numel(selection_current)
     
 
 
-    plot(t_sim, inLinSim.ia.Data, 'DisplayName', "linear slx out")
+    plot(t_sim, inLinSim.ia.Data, 'DisplayName', compose("ia_{%d, sim}", selection_current(i)))
     % plot(t_sim, inLinArmCircSim.ia.Data,'-.', 'DisplayName', "RL circuit slx out")
     % plot(t_sim, inNonlinSim.ia.Data, 'DisplayName', "nonlinear slx out")
 
     grid on;
     xlabel('time in s');
     ylabel('armatur current in A');
-    legend('Location','NorthEast');
-    xlim([0.46 0.54]);
+    legend('Location','SouthEast');
+    xlim([0.48 0.56]);
     % ylim([-0.2 1.2]);
 
     % title("current controller step response")
@@ -100,9 +100,9 @@ end
 
 %% outer loop - speed controller
 
-selection_speed = [6 7];
+selection_speed = [6 7 11];
 
-
+stop_times = [0.5 0.5 2];
 
 for i = 1:numel(selection_speed)
     selection = selection_speed(i);
@@ -131,6 +131,8 @@ for i = 1:numel(selection_speed)
     Tload = 0;
     w_start = wref(1);
     w_stop = wref(end);
+
+    stop_time = stop_times(i);
     
     idx = find(diff(sign(iaref)) > 1, 1, 'first');
 
@@ -141,12 +143,12 @@ for i = 1:numel(selection_speed)
     
     % G_wv_s = setx0(G_wv_s, [w_start; 0]);
 
-    t_step = 0.5;
+    t_step = 0.1;
     t_stop = t_data(end);
 
-    t_sim = t_step - 1 : Ts : t_step + 1;
+    t_sim = t_step + 0.3 : Ts : t_step + stop_time + 0.3;
 
-    [yTw, tTw] = step(Tw_z, t);
+    % [yTw, tTw] = step(Tw_z, t);
     outLinSim = sim("sim/Outer_Loop_Linear_DCM.slx", ReturnWorkspaceOutputs="on");
     % outLinArmCircSim = sim("sim/Outer_Loop_Linear_ArmatureCircuit.slx", ReturnWorkspaceOutputs="on");
     % outNonlinSim = sim("sim/Outer_Loop_NonLinear_DCM_PWM.slx", ReturnWorkspaceOutputs="on");
@@ -155,22 +157,27 @@ for i = 1:numel(selection_speed)
     figure(numel(selection_current)+i);
     hold on;
 
-    plot(t_data,wfilt, 'DisplayName', compose("w_{%d}", selection_speed(i)));
-    plot(t_data,wref, 'DisplayName', 'w_{ref}');
+    plot(t_data,wfilt*30/pi, 'DisplayName', compose("w_{%d}", selection_speed(i)));
+    plot(t_data,wref*30/pi, 'DisplayName', 'w_{ref}');
     
+    if (i < 3)
+        xlim([0.4 0.9]);
+    else
+        xlim([0.2 2.4]);
+    end
 
-
-    plot(t_sim, outLinSim.omega_m.Data, 'DisplayName', "linear slx out")
+    plot(t_sim, outLinSim.omega_m.Data*30/pi, 'DisplayName', compose("w_{%d, sim}", selection_speed(i)))
     % plot(t_sim, outLinArmCircSim.ia.Data, '-.', 'DisplayName', "RL circuit slx out")
     % plot(t_sim, outNonlinSim.omega_m.Data, 'DisplayName', "nonlinear slx out")
 
 
     grid on;
     xlabel('time in s');
-    ylabel('rotational speed in s^{-1}');
-    legend('Location','NorthEast');
-    xlim([0.4 0.9]);
-    % ylim([-0.2 1.2]);
+    ylabel('rotational speed in rpm');
+    legend('Location','SouthEast');
+
+    
+    ylim([w_start-0.1*max(wfilt) 1.1*max(wfilt)]*30/pi);
 
     % title("current controller step response")
 
