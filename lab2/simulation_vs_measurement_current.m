@@ -20,7 +20,7 @@ fnames={'exp01'
         };    
 
 %% load data
-selection=2;           % pick out one of the experiments listed in fnames
+selection=11;           % pick out one of the experiments listed in fnames
 
 fname=fnames{selection};
 mv=load(fname);
@@ -61,6 +61,15 @@ vdc=mv.Y(10).Data';        % V, filtered DC-link voltage
 w=mv.Y(12).Data';          % rad/s, speed unfiltered
 wfilt=mv.Y(11).Data';      % rad/s, speed filtered
 wref=mv.Y(13).Data';       % rad/s, reference speed
+
+%% 
+stop_time = 0.6;
+w_ref_start = -200;
+w_ref_stop = 200;
+
+% IC
+w0 = w(1);
+ia0 = ia(1);
 
 
 
