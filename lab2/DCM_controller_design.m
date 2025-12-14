@@ -145,6 +145,7 @@ G_iT_s = -(La*s+Ra) /(I*La*s^2 + Ra*I*s + (kPhi)^2);
 
 %%
 close all
+load Meinhart.mat
 
 
 

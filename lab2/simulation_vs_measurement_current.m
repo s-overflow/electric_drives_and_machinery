@@ -63,7 +63,7 @@ wfilt=mv.Y(11).Data';      % rad/s, speed filtered
 wref=mv.Y(13).Data';       % rad/s, reference speed
 
 %% 
-stop_time = 0.6;
+stop_time = 1.7;
 w_ref_start = -200;
 w_ref_stop = 200;
 
@@ -71,27 +71,49 @@ w_ref_stop = 200;
 w0 = w(1);
 ia0 = ia(1);
 
+torq_ts = timeseries(torq, t)
 
 
 %% presentation
-% 
+clc
+
 fn=1;
-figure(fn);
+figure(fn);clf;
+hold on
 plot(t,iaref,t,ia);
+plot(ia_sim)
+hold off
 grid on;
 xlabel('time in s');
-ylabel('armatur current in A');
-legend('ia_{ref}','ia','Location','NorthEast');
+ylabel('armature current in A');
+legend(["reference", "measured", "simulated"]);
 xlim([0.4 0.6]);
 % ylim([-0.2 1.2]);
 
 
 
+% fn=fn+1;
+% figure(fn);
+% hold on
+% plot(t,varef);
+% plot(va_sim)
+% hold off
+% grid on;
+% xlabel('time in s');
+% ylabel('armature voltage in V');
+% legend(["reference", "simulated"]);
+% xlim([0.4 0.6]);
+
+
 fn=fn+1;
-figure(fn);
-plot(t,varef);
+figure(fn);clf;
+hold on
+plot(t,wref);
+plot(t, w);
+plot(w_sim)
+hold off
 grid on;
 xlabel('time in s');
-ylabel('v_{a, ref} in V');
-xlim([0.4 0.6]);
-
+ylabel('angular speed in rpm');
+legend(["reference", "measured", "simulated"]);
+xlim([0.4 1.5]);
