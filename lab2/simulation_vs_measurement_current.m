@@ -63,46 +63,58 @@ wfilt=mv.Y(11).Data';      % rad/s, speed filtered
 wref=mv.Y(13).Data';       % rad/s, reference speed
 
 %% 
-stop_time = 1.7;
-w_ref_start = -200;
-w_ref_stop = 200;
+stop_time = 2;
+w_ref_start = -2000/30*pi;
+w_ref_stop = 2000/30*pi;
+
+t_step = 0.5;
 
 % IC
-w0 = w(1);
-ia0 = ia(1);
+w0 = w(1)/10;
+ia0 =0;%ia(1);
 
-torq_ts = timeseries(torq, t)
+
+time_shift = 0.5;
+torq_ts = timeseries(torq, t+time_shift);
+torq_ts.Data(1) = 0;
+torq_ts.Time(1) = 0;
 
 
 %% presentation
+% shift simulated time series to account for settling time
+ia_sim_res = ia_sim.Data(ia_sim.time > time_shift);
+va_sim_res = va_sim.Data(ia_sim.time > time_shift);
+w_sim_res = w_sim.Data(ia_sim.time > time_shift);
+t_sim_res = ia_sim.time(ia_sim.time > time_shift) - time_shift;
+
 clc
 
 fn=1;
 figure(fn);clf;
 hold on
 plot(t,iaref,t,ia);
-plot(ia_sim)
+plot(t_sim_res, ia_sim_res)
 hold off
 grid on;
 xlabel('time in s');
 ylabel('armature current in A');
 legend(["reference", "measured", "simulated"]);
-xlim([0.4 0.6]);
+xlim([0.4 stop_time]);
 % ylim([-0.2 1.2]);
 
 
 
-% fn=fn+1;
-% figure(fn);
-% hold on
-% plot(t,varef);
-% plot(va_sim)
-% hold off
-% grid on;
-% xlabel('time in s');
-% ylabel('armature voltage in V');
-% legend(["reference", "simulated"]);
-% xlim([0.4 0.6]);
+fn=fn+1;
+figure(fn),clf;
+hold on
+plot(t,varef);
+plot(t_sim_res,va_sim_res)
+hold off
+grid on;
+xlabel('time in s');
+ylabel('armature voltage in V');
+legend(["measured", "simulated"]);
+xlim([0.4 stop_time]);
 
 
 fn=fn+1;
@@ -110,10 +122,27 @@ figure(fn);clf;
 hold on
 plot(t,wref);
 plot(t, w);
-plot(w_sim)
+plot(t_sim_res, w_sim_res)
 hold off
 grid on;
 xlabel('time in s');
-ylabel('angular speed in rpm');
+ylabel('rotational speed in s^{-1}');
 legend(["reference", "measured", "simulated"]);
-xlim([0.4 1.5]);
+xlim([0.4 stop_time]);
+
+
+wfilt_sim_res = w_filtered_sim.Data(ia_sim.time > time_shift);
+twf_sim_res = w_filtered_sim.time(w_filtered_sim.time > time_shift)- time_shift;
+
+fn=fn+1;
+figure(fn);clf;
+hold on
+plot(t,wref);
+plot(t, wfilt);
+plot(twf_sim_res, wfilt_sim_res)
+hold off
+grid on;
+xlabel('time in s');
+ylabel('filtered rotational speed in s^{-1}');
+legend(["reference", "measured", "simulated"]);
+xlim([0.4 stop_time]);
