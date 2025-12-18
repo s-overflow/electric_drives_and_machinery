@@ -63,7 +63,7 @@ wfilt=mv.Y(11).Data';      % rad/s, speed filtered
 wref=mv.Y(13).Data';       % rad/s, reference speed
 
 %% 
-stop_time = 2;
+stop_time = 2.5;
 w_ref_start = -2000/30*pi;
 w_ref_stop = 2000/30*pi;
 
@@ -88,6 +88,8 @@ w_sim_res = w_sim.Data(ia_sim.time > time_shift);
 t_sim_res = ia_sim.time(ia_sim.time > time_shift) - time_shift;
 
 clc
+
+stop_time = 1.8;
 
 fn=1;
 figure(fn);clf;

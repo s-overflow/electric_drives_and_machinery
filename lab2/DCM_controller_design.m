@@ -140,8 +140,8 @@ ctrl.w.satN = -30;
 use_nonlin_model = 0;
 
 %%
-G_wT_s = kPhi / (I*La*s^2 + Ra*I*s + (kPhi)^2);
-G_iT_s = -(La*s+Ra) /(I*La*s^2 + Ra*I*s + (kPhi)^2);
+G_iT_s = kPhi / (I*La*s^2 + Ra*I*s + (kPhi)^2);
+G_wT_s = -(La*s+Ra) /(I*La*s^2 + Ra*I*s + (kPhi)^2);
 
 %%
 close all
