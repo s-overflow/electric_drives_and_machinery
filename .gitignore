@@ -1,0 +1,15 @@
+# eps graphics - are stored in overleaf
+*.eps
+
+# Simulink code generation
+**/slprj/ 
+
+# Windows default autosave extension
+*.asv
+*.autosave
+
+# Simulink Cache 
+*.slxc
+
+# further non essential directories
+/temp

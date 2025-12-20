@@ -11,7 +11,7 @@ fnames={'exp01'
         'exp11'        
         };    
 
-selections = [2 5];
+selections = [11];
 
 inverted = [1 1];
 
