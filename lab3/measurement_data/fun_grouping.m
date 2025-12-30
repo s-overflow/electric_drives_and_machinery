@@ -42,6 +42,10 @@ plot(act,'-bo');
 xlabel('index');
 ylabel('mw(:,index)');
 hold on;
+
+ids = [];
+vals = [];
+
 for z=1:length(indexStep);  % groups
     actindex=[[ai:index(indexStep(z))]'; index(indexStep(z))+1];
     length(actindex);
@@ -51,9 +55,14 @@ for z=1:length(indexStep);  % groups
         avg(z,1:n)=mean(mw(actindex,:));
         avg(z,n+1)=1;
         plot(actindex,act(actindex),'r*');
-    end;
+       
+        ids = [ids; actindex];
+        vals = [vals; act(actindex)];
+    end
     ai=index(indexStep(z)+1);
-end;        
+end
+
+
 
 actindex=[ai:index(end)+1]';
 if length(actindex)>(minMembers+2*fringe)
@@ -61,7 +70,10 @@ if length(actindex)>(minMembers+2*fringe)
     avg(z+1,1:n)=mean(mw(actindex,:));
     avg(z+1,n+1)=1;
     plot(actindex,act(actindex),'r*');
-end;
+
+    ids = [ids; actindex];
+    vals = [vals; act(actindex)];
+end
 figure(fn);
 hold off;
 index=find(avg(:,n+1)==0);
@@ -69,10 +81,5 @@ avg(index,:)=[];
 result.avg=avg(:,[1:end-1]);
 
 
-
-
-
-
-
-
-% 
+result.ids = ids;
+result.vals = vals;
