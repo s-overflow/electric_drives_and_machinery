@@ -9,7 +9,7 @@ fnames={'25A_90deg'  %  1, standstill, curent controlled, imax=25A |d(i)/dt|=2 A
     %  4, standstill, curent controlled, imax=25A |d(i)/dt|=2 A/s, phi_i=90°; start from 0A
         };    
    
-wahl=3;
+wahl=1;
 
 fname=fnames{wahl};
 mv=load(fname);
@@ -59,21 +59,33 @@ dc=mv.Y(9).Data';
 
 
     
-    
+    % abc -> alpha, beta
     T=2/3*[1 -.5 -.5
            0 sqrt(3)/2 -sqrt(3)/2
            .5 .5 .5];
-       
+    
+    % space vector
     isS=(T*[ia ib -ia-ib]')';
     is=sqrt(isS(:,1).^2+isS(:,2).^2);
     
     phii=atan2(isS(:,2),isS(:,1));
+
+    % phii and t gets overwritten in line ~160
     
-    phiiu=unwrap(phii);
+    % get stator frequency, but isnt used?
+    phiiu=unwrap(phii); 
     gi=polyfit(t,phiiu,1);
     ws=gi(1);
     fs=ws/(2*pi)
 
+    % figure(333)
+    % hold on
+    % plot(t, phiiu)
+    % plot(t, ws*t + gi(2))
+    % hold off
+    % legend(["phii unwrapped", "linear fit"])
+    % xlabel("t in s")
+    % ylabel("phi / rad")
     
     vsS=(T*[va vb vc]')';
     vs=sqrt(vsS(:,1).^2+vsS(:,2).^2);
@@ -82,7 +94,7 @@ dc=mv.Y(9).Data';
 %     nn=20;
 %     bb=ones(nn,1);
 %     aa=zeros(nn,1);
-%     aa(1)=nn;
+%     plot(plplaa(1)=nn;
 %     
 %     vsSf=filtfilt(bb,aa,vsS);
 %     vsSf=filtfilt(bb,aa,vsS);
@@ -133,11 +145,11 @@ dc=mv.Y(9).Data';
     xlabel('Time in s');
     ylabel('Speed in rpm');
     
-            figure(7);
+    figure(7);
     plot(ib,vb);
     grid on;
     xlabel('Time in s');
-    ylabel('...');
+    ylabel('vb in V');
 
     
     %% N5000 Messwerte
