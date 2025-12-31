@@ -9,7 +9,7 @@ fnames={'25A_90deg'  %  1, standstill, curent controlled, imax=25A |d(i)/dt|=2 A
     %  4, standstill, curent controlled, imax=25A |d(i)/dt|=2 A/s, phi_i=90°; start from 0A
         };    
    
-wahl=1;
+wahl=3;
 
 fname=fnames{wahl};
 mv=load(fname);
@@ -266,16 +266,12 @@ i_sel = iabc(:, sel);
 
 i_threshold = 5;
 vir_lin1 = vi(i_sel > i_threshold);
-vi0_lin1 = u0(i_sel > i_threshold);
 i_lin1 = i_sel(i_sel > i_threshold);
 p1=polyfit(i_lin1,vir_lin1,1);
-p01 = polyfit(i_lin1,vi0_lin1,1);
 
 vir_lin2 = vi(i_sel < -i_threshold);
-vi0_lin2 = u0(i_sel < -i_threshold);
 i_lin2 = i_sel(i_sel < -i_threshold);
 p2=polyfit(i_lin2,vir_lin2,1);
-p02 = polyfit(i_lin2,vi0_lin2,1);
 
 gradients_IM = [p1(1), p2(1)];
 pg_diff_IM = diff(gradients_IM)
@@ -284,7 +280,8 @@ if(max(abs(pg_diff_IM)) > allowed_diff)
     warning("vi_IM fit: max gradient diff: " + max(abs(pg_diff_IM)) + " > " +allowed_diff);
 end
 
-gradients_0 = [p02(1)];
+p02 = polyfit(i_sel,vi,1);
+gradients_0 = p02(1);
 pg_diff_0 = diff(gradients_0)
 if(max(abs(pg_diff_0)) > allowed_diff)
     warning("vi_0 fit: max gradient diff: " + max(abs(pg_diff_0)) + " > " +allowed_diff);
@@ -326,12 +323,25 @@ title("Phase "+ phases_str(sel))
 figure(21),clf;
 hold on
 plot(i_sel,vi);
-plot(i_lin1, p01(1)*i_lin1 + p01(2),"--", "LineWidth",1.3)
-plot(i_lin2, p02(1)*i_lin2 + p02(2),"--", "LineWidth",1.3)
 plot(i_help, mean(gradients_0)*i_help,"-.", "LineWidth",1.3)
 hold off
 grid on;
-legend(["measured", "linear region+ fit", "linear region- fit", "mean fit gradient"])
+legend(["measured", "mean fit gradient"])
 xlabel('ii in A');
 ylabel('vi-0 in V');
 title("Star point voltage for measurement "+ phases_str(sel))
+
+%% calc Rcnv
+clear
+clc
+
+load cvd_calc.mat
+
+v0_per_i = [v0_per_ia; v0_per_ib; v0_per_ic];
+vIM_per_i = [va_per_ia; vb_per_ib; vc_per_ic];
+vref_per_i = [varef_per_ia; vbref_per_ib; vcref_per_ic];
+
+Rcnv_vec = vref_per_i - v0_per_i - vIM_per_i;
+Rcnv = diag(Rcnv_vec);
+
+save("cvd_calc.mat", "Rcnv", "-append");
