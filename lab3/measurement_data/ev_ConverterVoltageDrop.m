@@ -146,29 +146,29 @@ legend('unfiltered','filtered','Location','best');
 % ylabel('Speed in rpm');
 
 %% get viref_per_ii dSpace data
-% vabc_ref = [va vb vc];
-% iabc_ref = [ia ib ic];
-% 
-% sel = mod(wahl,3) + 1;
-% vi_ref = vabc_ref(:, sel);
-% i_sel = iabc_ref(:, sel);
-% 
-% i_threshold = 5;
-% vir_lin1 = vi_ref(i_sel > i_threshold);
-% i_lin1 = i_sel(i_sel > i_threshold);
-% p1=polyfit(i_lin1,vir_lin1,1);
-% 
-% vir_lin2 = vi_ref(i_sel < -i_threshold);
-% i_lin2 = i_sel(i_sel < -i_threshold);
-% p2=polyfit(i_lin2,vir_lin2,1);
-% 
-% gradients = [p1(1), p2(1)];
-% pg_diff = diff(gradients)
-% allowed_diff = 1e-2;
-% if(max(abs(pg_diff)) > allowed_diff)
-%     warning("vi_ref fit: max gradient diff: " + max(abs(pg_diff)) + " > " +allowed_diff);
-% end
-% 
+vabc_ref = [va vb vc];
+iabc_ref = [ia ib ic];
+
+sel = mod(wahl,3) + 1;
+vi_ref = vabc_ref(:, sel);
+i_sel = iabc_ref(:, sel);
+
+i_threshold = 5;
+vir_lin1 = vi_ref(i_sel > i_threshold);
+i_lin1 = i_sel(i_sel > i_threshold);
+p1=polyfit(i_lin1,vir_lin1,1);
+
+vir_lin2 = vi_ref(i_sel < -i_threshold);
+i_lin2 = i_sel(i_sel < -i_threshold);
+p2=polyfit(i_lin2,vir_lin2,1);
+
+gradients = [p1(1), p2(1)];
+pg_diff = diff(gradients)
+allowed_diff = 1e-2;
+if(max(abs(pg_diff)) > allowed_diff)
+    warning("vi_ref fit: max gradient diff: " + max(abs(pg_diff)) + " > " +allowed_diff);
+end
+
 % switch wahl
 %     % ia = 0, sel = b
 %     case 1
@@ -183,19 +183,19 @@ legend('unfiltered','filtered','Location','best');
 %         varef_per_ia = mean(gradients);
 %         save("cvd_calc.mat", "varef_per_ia", "-append");
 % end
-% 
-% i_help = min(i_sel):1:max(i_sel);
-% figure(7),clf;
-% hold on
-% plot(i_sel,vi_ref);
-% plot(i_lin1, p1(1)*i_lin1 + p1(2),"--", "LineWidth",1.3)
-% plot(i_lin2, p2(1)*i_lin2 + p2(2),"--", "LineWidth",1.3)
-% plot(i_help, mean(gradients)*i_help,"-.", "LineWidth",1.3)
-% hold off
-% grid on;
-% legend(["measured", "linear region+ fit", "linear region- fit", "mean fit gradient"])
-% xlabel('i-ref in A');
-% ylabel('vi-ref in V');
+
+i_help = min(i_sel):1:max(i_sel);
+figure(7),clf;
+hold on
+plot(i_sel,vi_ref);
+plot(i_lin1, p1(1)*i_lin1 + p1(2),"--", "LineWidth",1.3)
+plot(i_lin2, p2(1)*i_lin2 + p2(2),"--", "LineWidth",1.3)
+plot(i_help, mean(gradients)*i_help,"-.", "LineWidth",1.3)
+hold off
+grid on;
+legend(["measured", "linear region+ fit", "linear region- fit", "mean fit gradient"])
+xlabel('ii in A');
+ylabel('vi_{ref} in V');
     
     %% N5000 Messwerte
     mw=mwgeigl(pwd,fname);
