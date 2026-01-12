@@ -13,11 +13,10 @@ G_iv_z = c2d(G_iv_s, Ts);           % voltage to current
 G_lambdai_z = c2d(G_lambdai_s, Ts); % current to flux linkage 
 
 %% current controller
-% cancel plant pole in continuous time to get starting point for tuning in
-% discrete time
-
 % place zero of controller at pole of plant, cancel gain, add safety margin
-% for satbility by placing controller zero more within the unit sphere 
+% for satbility by adjusting controller gain, which then determines pole of
+% overall transfer function Ti(z)
+
 [zGiv, pGiv,kGiv] = zpkdata(G_iv_z, 'v');
 % remaining controller must be within unit sphere, faster when near border,
 % but phase margin must be sufficient
@@ -66,6 +65,8 @@ ctrl.i.kb = Ts/ctrl.i.T;    % TODO: adjust that backcalc gain when model is read
 
 % save('tuned_controllers/std_controllers.mat', "ctrl")
 
+% cancel plant pole in continuous time to get starting point for tuning in
+% discrete time
 % Ci gains in continuous time
 % kIi = R_sigma;              % integral gain
 % kPi = R_sigma*Tau_sigma;    % proportional
