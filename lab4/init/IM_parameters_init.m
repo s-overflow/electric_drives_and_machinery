@@ -33,6 +33,20 @@ im.ET = [ 1       0;
          -0.5   sqrt(3)/2;
          -0.5  -sqrt(3)/2 ];
 
+
+J = 0.0168;         % inertia
+p = 2;              % pole pairs
+
+par.Ts = Ts;
+par.p = p;
+par.J = J;
+par.Ls = Ls;
+par.Lr = Lr;
+par.Lm = Lm;
+par.Rs = Rs;
+par.Rr = Rr;
+busInfo = Simulink.Bus.createObject(par);
+
 %% limits
 % TODO: use actual current and voltage limits
 im.vDC = 124;   % V
@@ -47,6 +61,6 @@ G_lambdai_s = Lm / (s*Tau_R + 1);
 
 %% controller gains
 if(~exist('ctrl', 'var'))
-    load("../tuned_controllers/std_controllers.mat")
+    load("tuned_controllers/std_controllers.mat")
     disp("Loaded standard controller parameters")
 end
