@@ -146,8 +146,8 @@ G_omega_z = Ti_z * H_omega_z * F_speed_z;
 G_omega_z = minreal(G_omega_z);
 
 % get starting point of tuning by guessing (+ bode)
-C_omega = GetPI4Tuning(2e-4, 1, Ts);
-%C_omega.Gz = zpk(1-2.0649e-05,1, 56.416, Ts); % seemed nice
+%C_omega = GetPI4Tuning(2e-4, 1, Ts);
+C_omega.Gz = zpk(1-2.065e-05,1, 56.416, Ts); % seemed nice, PM ~ 57deg, tr ~ 30ms
 
 sisotool(G_omega_z, C_omega.Gz, 1, 1);
 %sisotool(G_omega_z, C_omega.Gz, 1, 1); % consider dynamic of speed sensor
