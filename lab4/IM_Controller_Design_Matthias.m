@@ -149,9 +149,10 @@ G_omega_z = minreal(G_omega_z);
 %C_omega = GetPI4Tuning(2e-4, 1, Ts);
 C_omega.Gz = zpk(1-2.065e-05,1, 56.416, Ts); % seemed nice, PM ~ 57deg, tr ~ 30ms
 
-sisotool(G_omega_z, C_omega.Gz, 1, 1);
+%sisotool(G_omega_z, C_omega.Gz, 1, 1);
 %sisotool(G_omega_z, C_omega.Gz, 1, 1); % consider dynamic of speed sensor
 %C_omega_z = C_omega.Gz;
+
 
 % neglect time delay
 L_omega_z = G_omega_z*C_omega_z;  
