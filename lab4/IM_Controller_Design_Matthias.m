@@ -139,7 +139,8 @@ H_omega_z = c2d(H_omega_s, Ts);
 
 % speed sensor filter - highpass characteristic
 F_speed_z = 1/Ts*(z-1)/z;
-%G_speed_z = 1 * F_speed_z; % consider other dynamic
+F_wq_s = ss(tf(1, [1/(2*pi*20), 1])); % consider LPF dynamic
+F_wq_z = c2d(F_wq_s, Ts, 'tustin');
 
 % plant visible to speed controller
 G_omega_z = Ti_z * H_omega_z * F_speed_z;
@@ -150,8 +151,8 @@ G_omega_z = minreal(G_omega_z);
 C_omega.Gz = zpk(1-2.065e-05,1, 56.416, Ts); % seemed nice, PM ~ 57deg, tr ~ 30ms
 
 %sisotool(G_omega_z, C_omega.Gz, 1, 1);
-%sisotool(G_omega_z, C_omega.Gz, 1, 1); % consider dynamic of speed sensor
-%C_omega_z = C_omega.Gz;
+%sisotool(G_omega_z, C_omega.Gz, F_wq_z, 1); % consider dynamic of speed sensor
+C_omega_z = C_omega.Gz;
 
 
 % neglect time delay
