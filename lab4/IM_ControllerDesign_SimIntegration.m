@@ -45,15 +45,15 @@ Ti_z = minreal(Li_z/(1+Li_z)); %feedback(Li_z, 1);
 Li_zz = Li_z * tf(1,[1, 0], Ts);   
 Ti_zz = minreal(Li_zz/(1+Li_zz));
 
-% figure(1),clf;
-% hold on
-% bode(G_iv_z)
-% bode(Ci_z);
-% bode(Li_z)
-% grid minor
-% xlim([1, 1e5])
-% title("current controller")
-% legend(["G(z)", "C(z)", "L(z)"])
+figure(1),clf;
+hold on
+bode(G_iv_z)
+bode(Ci_z);
+bode(Li_z)
+grid minor
+xlim([1, 1e5])
+title("current controller")
+legend(["G(z)", "C(z)", "L(z)"])
 
 en_d = 1;
 en_q = 0;
@@ -80,7 +80,7 @@ ctrl.Ts = Ts;       % controller sampling time
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.i = GetCtrlForm4Lab(Ci_z, Ts);
 
-% save('tuned_controllers/propParamAddendum.mat', "ctrl")
+% save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 %% flux controller
 % use continuous time rule of thumb for starting
@@ -112,13 +112,12 @@ legend(["G(z)", "C(z)", "L(z)"])
 
 en_lambda = 1;
 en_d = 1;
-en_q = 1;
+en_q = 0;
 
 iSq_step = 10;
 t_iqstep = 0.1;
 
 [y_lin_lambda, tOut] = step(T_lambda_zz); 
-tOut = tOut + t_iqstep;
 %out = sim("sim\IM_FluxControllerDesign_vdqsat.slx");
 
 figure(2),clf
@@ -134,7 +133,7 @@ title("flux loop overall step response")
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.lambdar = GetCtrlForm4Lab(C_lambda_z, Ts);
 
-% save('tuned_controllers/propParamAddendum.mat', "ctrl")
+% save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 %% speed controller
 
@@ -168,8 +167,7 @@ G_omega_z = Ti_z * H_omega_z * F_speed_z;
 G_omega_z = minreal(G_omega_z);
 
 % get starting point of tuning by guessing (+ bode)
-%C_omega = GetPI4Tuning(2e-4, 1, Ts);
-C_omega.Gz = zpk(1-7e-08, 1, 1.503, Ts); % considers Fwqz in feedback path
+C_omega.Gz = zpk(1-7e-08, 1, 1.503, Ts); % wStepMax = 85rpm, to keep linear, for addendum params
 
 %sisotool(G_omega_z, C_omega.Gz, F_wq_z, 1); % consider dynamic of speed sensor
 C_omega_z = minreal(C_omega.Gz);
@@ -177,12 +175,10 @@ C_omega_z = minreal(C_omega.Gz);
 
 % neglect time delay
 L_omega_z = G_omega_z*C_omega_z;  
-%T_omega_z = minreal(L_omega_z/(1+L_omega_z*F_wq_z)); %feedback();
 T_omega_z = minreal(feedback(L_omega_z, F_wq_z));
 
 % considers time delay due to converter
 L_omega_zz = L_omega_z * 1/z;
-%T_omega_zz = minreal(L_omega_zz/(1+L_omega_zz*F_wq_z)); %feedback();
 T_omega_zz = minreal(feedback(L_omega_zz, F_wq_z));
 
 
@@ -197,12 +193,12 @@ xlim([1, 1e5])
 title("speed controller")
 legend(["G(z)", "C(z)", "L(z)"])
     
-w_amp = 1;
+w_amp = 1;%1000*pi/30;
 t_wstep = 0.12; % delay speed controller step to let flux controller settle 0.2
 
 [y_lin_w, tOut] = step(T_omega_zz);
 tOut = tOut + t_wstep;
-%out = sim("sim\IM_SpeedController_Design_ivdqsat.slx");
+out = sim("sim\IM_SpeedController_Design_ivdqsat.slx");
 
 figure(2),clf
 hold on
@@ -216,7 +212,7 @@ title("speed loop overall step response")
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.w = GetCtrlForm4Lab(C_omega_z, Ts);
 
-%save('tuned_controllers/propParamAddendum.mat', "ctrl")
+%save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 
 function C = GetPI4Tuning(Tau, k, Ts)
