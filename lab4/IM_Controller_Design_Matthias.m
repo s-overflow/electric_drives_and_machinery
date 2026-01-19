@@ -71,8 +71,6 @@ ctrl.i = GetCtrlForm4Lab(Ci_z, Ts);
 % Ci_s = kIi*1/s + kPi;
 % sisotool(G_iv_z, Ci_z, 1, 1);
 
-clear("bi")
-
 %% flux controller
 % use continuous time rule of thumb for starting
 C_lambda = GetPI4Tuning(Tau_R, Lm, Ts);
@@ -101,13 +99,16 @@ xlim([1, 1e5])
 title("flux controller")
 legend(["G(z)", "C(z)", "L(z)"])
 
+[y_lin_lambda, tOut] = step(T_lambda_z); 
+%out = sim("sim\IM_FluxController_Design.slx");
+
 figure(2),clf
 hold on
-step(T_lambda_zz)
-step(T_lambda_z)
+plot(tOut, y_lin_lambda*lambda_Rd_ref, 'LineWidth',1.3)
+plot(out.lmbdaRd, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
-legend(["with delay", "without delay"])
+legend(["linear system", "with saturation"])
 title("flux loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
@@ -175,13 +176,29 @@ xlim([1, 1e5])
 title("speed controller")
 legend(["G(z)", "C(z)", "L(z)"])
 
+w_amp = 1;
+t_wstep = 0.2; % delay speed controller step to let flux controller settle
+
+use_sat = 0;
+if(~use_sat)
+    im.vSmax = 1e9;
+    im.iSmax = 1e9;
+else
+    im.vSmax = 30;
+    im.iSmax = 55;
+end
+
+[y_lin_w, tOut] = step(T_omega_z);
+tOut = tOut + t_wstep;
+out = sim("sim\IM_SpeedController_Design.slx");
+
 figure(2),clf
 hold on
-step(T_omega_zz)
-step(T_omega_z)
+plot(tOut, y_lin_w*w_amp, 'LineWidth',1.3)
+plot(out.w_hat, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
-legend(["with delay", "without delay"])
+legend(["linear system", "with saturation"])
 title("speed loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab

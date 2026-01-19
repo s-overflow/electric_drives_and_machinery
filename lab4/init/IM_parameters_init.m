@@ -83,7 +83,7 @@ G_h_s = F_lambdai_s;                        % actual flux relation
 
 
 
-%% controller gains
+%% controller
 
 lambda_Rd_ref = 0.08; % [Vs] constant
 
@@ -91,3 +91,7 @@ if(~exist('ctrl', 'var'))
     load("../tuned_controllers/std_controllers.mat")
     disp("Loaded standard controller parameters")
 end
+
+en = 1;         % enable controllers
+im.iSmax = 30;     % max current space vector
+im.vSmax = 55;     % max voltage space vector
