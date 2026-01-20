@@ -7,7 +7,7 @@ Ts = 200*1e-6;   % switching period and sampling period of controller
 s=tf('s');
 
 % use either our measured parameters or the ones from the addendum
-use_measured_params = 0;
+use_measured_params = 1;
 
 %% IM parameters (assignment sheet)
 
@@ -105,10 +105,10 @@ lambda_Rd_ref = 0.08; % [Vs] constant
 if(~exist('ctrl', 'var'))
     try
         if(use_measured_params)
-            load("../tuned_controllers/ourParams_w150ms.mat")
+            load("../tuned_controllers/our_params.mat")
             disp("Loaded controller for measured parameters from lab3")
         else
-            load("../tuned_controllers/w_neu.mat")
+            load("../tuned_controllers/rs_approved.mat")
             disp("Loaded controller for proposed parameters from addendum")
         end
     catch

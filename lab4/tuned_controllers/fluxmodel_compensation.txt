@@ -1,0 +1,9 @@
+% Rr is unusually low, maybe try with 91mOhm, model wont be that good
+
+Rs = 0.1995;        % Stator resistance [Ohm] 
+Rr = 0.0851;        % Rotor resistance  [Ohm] 
+
+% Inductances
+LsigmaS = 402.4e-6;  % Stator leakage inductance [H] 
+LsigmaR_ = 402.4e-6; % Rotor leakage inductance  [H] LsigmaR'
+Lm = 5.685e-3;       % Magnetising inductance    [H]

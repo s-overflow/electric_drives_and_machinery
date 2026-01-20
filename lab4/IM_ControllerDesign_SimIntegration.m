@@ -37,7 +37,7 @@ zCi = pGiv;
 pCi = 1;                % pole: discrete PI has pole always at one
 % w1Ci = 2*pi*1;
 % kCi = w1Ci/abs(freqresp(G_iv_s, w1Ci));  % gain: rule of thumb
-kCi = 0.2/kGiv;       % limit : 1/kGiv
+kCi = 0.25/kGiv;       % limit : 1/kGiv
 Ci_z = zpk(zCi, pCi, kCi, ctrl.Ts );
 
 % neglect time delay
@@ -80,6 +80,7 @@ title("inner loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.i = GetCtrlForm4Lab(Ci_z, ctrl.Ts );
+ctrl.i.kb = ctrl.i.kb * 1.5;
 
 % save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
@@ -170,7 +171,7 @@ G_omega_z = minreal(G_omega_z);
 % get starting point of tuning by guessing (+ bode)
 C_omega.Gz = zpk(1-6.11e-04, 1, 1.2378, ctrl.Ts ); % wStepMax = 85rpm, to keep linear, for addendum params
 
-%sisotool(G_omega_z, tf(1,1,ctrl.Ts ), F_wq_z, 1); % consider dynamic of speed sensor
+%sisotool(G_omega_z, C_omega.Gz, F_wq_z, 1); % consider dynamic of speed sensor
 C_omega_z = minreal(C_omega.Gz);
 
 
@@ -213,7 +214,7 @@ title("speed loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.w = GetCtrlForm4Lab(C_omega_z, ctrl.Ts );
-ctrl.w.kb = ctrl.w.kb*2/1.5; % make it a little bit faster
+ctrl.w.kb = ctrl.w.kb; % make it a little bit faster
 
 %save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
@@ -224,7 +225,7 @@ function C = GetPI4Tuning(Tau, k, Ts )
 
     s=tf('s');
     
-    C.kP = 2/k;
+    C.kP = 5/k;
     C.Tn = Tau;
     C.Gs = C.kP*(1 + 1/(C.Tn*s));    % maybe slow
     C.Gz = c2d(C.Gs, Ts );
