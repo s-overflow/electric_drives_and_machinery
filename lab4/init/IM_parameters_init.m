@@ -2,7 +2,7 @@ clear all
 clc
 close all
 
-Ts = 200*1e-9;
+Ts = 200*1e-7; % Ts = 200*1e-9;
 
 s=tf('s');
 
@@ -57,7 +57,13 @@ par.Lr = Lr;
 par.Lm = Lm;
 par.Rs = Rs;
 par.Rr = Rr;
+par.is_max = 30;
+par.k_is = 0.8;
+
+
 busInfo = Simulink.Bus.createObject(par);
+
+
 
 %%
 % Incremental encoder
@@ -98,10 +104,10 @@ lambda_Rd_ref = 0.08; % [Vs] constant
 if(~exist('ctrl', 'var'))
     %load("../tuned_controllers/std_controllers.mat")
     if(use_measured_params)
-        load("../tuned_controllers/ourParams_w150ms.mat")
+        load("tuned_controllers/ourParams_w150ms.mat")
         disp("Loaded controller for measured parameters from lab3")
     else
-        load("../tuned_controllers/propParamAddendum.mat")
+        load("tuned_controllers/propParamAddendum.mat")
         disp("Loaded controller for proposed parameters from addendum")
     end
 end
