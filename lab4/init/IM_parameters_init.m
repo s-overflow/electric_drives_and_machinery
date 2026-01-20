@@ -7,7 +7,7 @@ Ts = 200*1e-7; % Ts = 200*1e-9;
 s=tf('s');
 
 % use either our measured parameters or the ones from the addendum
-use_measured_params = 1;
+use_measured_params = 0;
 
 %% IM parameters (assignment sheet)
 
