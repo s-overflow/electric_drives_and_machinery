@@ -18,7 +18,7 @@ saveFig = @(figNo, name) exportgraphics(figure(figNo), ...
     fullfile(outDir, name + ".png"), 'Resolution', 300);
 
 % --- Known parameters (from locked rotor test etc.)
-Lsigs = 0.6897e-03;   % stator leakage inductance (H)
+Lsigs = 0.4024e-03;   % stator leakage inductance (H)
 Rs    = 0.1995;                  % stator resistance (Ohm)
 
 % --- Read measured fundamental harmonics
@@ -69,6 +69,29 @@ Im  = Vm ./ (ws .* Lm);          % magnetizing current (reactive part)
 % --- Magnetizing flux linkage magnitude (Lambda_m)
 Lambda_m = Vm ./ ws;             % because |Vm| = ws * |Lambda_m|
 
+% --- Reference magnetizing inductance at Lambda_m_ref = 0.08 Vs
+Lambda_m_ref = 0.08;   % [Vs]
+
+[Lambda_sorted, idx] = sort(Lambda_m);
+Lm_sorted = Lm(idx);
+
+% Remove duplicates in Lambda_sorted (keep first occurrence)
+[Lambda_unique, ia] = unique(Lambda_sorted, 'stable');
+Lm_unique = Lm_sorted(ia);
+
+% Interpolate Lm at the desired reference flux linkage
+Lm_ref = interp1(Lambda_unique, Lm_unique, Lambda_m_ref, 'linear', 'extrap');
+
+
+disp("========== REFERENCE MAGNETIZING INDUCTANCE ==========");
+fprintf("Lm_ref at Lambda_m_ref = %.3f Vs: %.6e H\n", Lambda_m_ref, Lm_ref);
+
+R_FE = mean(RFe);
+
+disp("========== IRON-LOSS RESISTANCE ==========");
+fprintf("R_{FE} = %.3f Ohm\n", R_FE);
+
+
 % ---------------- Figures + Export ----------------
 
 figure(200); clf
@@ -106,18 +129,9 @@ ylabel("Iron loss resistance RFe [Ohm]");
 grid on; zoom on;
 saveFig(204, "Is_vs_RFe");
 
-% --- Reference magnetizing inductance at Lambda_m_ref = 0.08 Vs
-Lambda_m_ref = 0.08;   % [Vs]
-
-[Lambda_sorted, idx] = sort(Lambda_m);
-Lm_sorted = Lm(idx);
-
-% Remove duplicates in Lambda_sorted (keep first occurrence)
-[Lambda_unique, ia] = unique(Lambda_sorted, 'stable');
-Lm_unique = Lm_sorted(ia);
-
-% Interpolate Lm at the desired reference flux linkage
-Lm_ref = interp1(Lambda_unique, Lm_unique, Lambda_m_ref, 'linear', 'extrap');
-
-disp("========== REFERENCE MAGNETIZING INDUCTANCE ==========");
-fprintf("Lm_ref at Lambda_m_ref = %.3f Vs: %.6e H\n", Lambda_m_ref, Lm_ref);
+figure(205); clf
+plot(Lambda_m, Lm,'o-');
+xlabel("Magnetizing flux linkage |Lambda_m| [Vs]");
+ylabel("Magnetizing inductance Lm [H]");
+grid on; zoom on;
+saveFig(205, "Lamda_m_vs_Lm");
