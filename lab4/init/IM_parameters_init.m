@@ -2,7 +2,7 @@ clear all
 clc
 close all
 
-Ts = 200*1e-7; % Ts = 200*1e-9;
+Ts = 200*1e-6;   % switching period and sampling period of controller
 
 s=tf('s');
 
@@ -101,14 +101,18 @@ G_h_s = F_lambdai_s;                        % actual flux relation
 
 lambda_Rd_ref = 0.08; % [Vs] constant
 
+
 if(~exist('ctrl', 'var'))
-    %load("../tuned_controllers/std_controllers.mat")
-    if(use_measured_params)
-        load("tuned_controllers/ourParams_w150ms.mat")
-        disp("Loaded controller for measured parameters from lab3")
-    else
-        load("tuned_controllers/propParamAddendum.mat")
-        disp("Loaded controller for proposed parameters from addendum")
+    try
+        if(use_measured_params)
+            load("../tuned_controllers/ourParams_w150ms.mat")
+            disp("Loaded controller for measured parameters from lab3")
+        else
+            load("../tuned_controllers/w_neu.mat")
+            disp("Loaded controller for proposed parameters from addendum")
+        end
+    catch
+        warning("init script not called from its directory, controllers are not not being loaded")
     end
 end
     
