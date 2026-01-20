@@ -1,4 +1,4 @@
-    clear all
+clear all
 clc
 close all
 
@@ -6,17 +6,29 @@ Ts = 200*1e-9;
 
 s=tf('s');
 
+% use either our measured parameters or the ones from the addendum
+use_measured_params = 1;
+
 %% IM parameters (assignment sheet)
 
 % Electrical resistances
-Rs = 0.149;        % Stator resistance [Ohm] 
-Rr = 0.103;        % Rotor resistance  [Ohm] 
-
-% Inductances
-LsigmaS = 3.43e-4;  % Stator leakage inductance [H] 
-LsigmaR_ = 5.00e-4; % Rotor leakage inductance  [H] LsigmaR'
-Lm = 8.27e-3;       % Magnetising inductance    [H]
-
+if(use_measured_params)
+    Rs = 0.1995;        % Stator resistance [Ohm] 
+    Rr = 0.0851;        % Rotor resistance  [Ohm] 
+    
+    % Inductances
+    LsigmaS = 402.4e-6;  % Stator leakage inductance [H] 
+    LsigmaR_ = 402.4e-6; % Rotor leakage inductance  [H] LsigmaR'
+    Lm = 5.685e-3;       % Magnetising inductance    [H]
+else % from lab addendum
+    Rs = 0.149;        % Stator resistance [Ohm] 
+    Rr = 0.103;        % Rotor resistance  [Ohm] 
+    
+    % Inductances
+    LsigmaS = 3.43e-4;  % Stator leakage inductance [H] 
+    LsigmaR_ = 5.00e-4; % Rotor leakage inductance  [H] LsigmaR'
+    Lm = 8.27e-3;       % Magnetising inductance    [H]
+end
 % convenience; 
 Ls = LsigmaS + Lm;              % Ass Sheet (5)
 Lr = LsigmaR_ + Lm;
@@ -79,15 +91,21 @@ G_iv_s = 1/R_sigma * 1/(Tau_sigma*s + 1);
 F_lambdai_s = Lm / (s*Tau_R + 1);           % flux  model
 G_h_s = F_lambdai_s;                        % actual flux relation
 
-
-
-
-
-%% controller gains
+%% controller
 
 lambda_Rd_ref = 0.08; % [Vs] constant
 
 if(~exist('ctrl', 'var'))
-    load("../tuned_controllers/std_controllers.mat")
-    disp("Loaded standard controller parameters")
+    %load("../tuned_controllers/std_controllers.mat")
+    if(use_measured_params)
+        load("../tuned_controllers/ourParams_w150ms.mat")
+        disp("Loaded controller for measured parameters from lab3")
+    else
+        load("../tuned_controllers/propParamAddendum.mat")
+        disp("Loaded controller for proposed parameters from addendum")
+    end
 end
+    
+en = 1;         % enable controllers
+im.iSmax = 30;     % max current space vector
+im.vSmax = 55;     % max voltage space vector

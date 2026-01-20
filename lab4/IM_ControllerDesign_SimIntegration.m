@@ -11,7 +11,16 @@ z = tf('z',Ts);
 % discrete time TF
 G_iv_z = c2d(G_iv_s, Ts);           % voltage to current
 F_lambdai_z = c2d(F_lambdai_s, Ts); % current to flux linkage model
-G_h_z = c2d(G_h_s, Ts);             % actual flux relation        
+G_h_z = c2d(G_h_s, Ts);             % actual flux relation    
+
+use_sat = 1;
+if(~use_sat)
+    im.vSmax = 1e9;
+    im.iSmax = 1e9;
+else
+    im.vSmax = 30;
+    im.iSmax = 55;
+end
 
 %% current controller
 % place zero of controller at pole of plant, cancel gain, add safety margin
@@ -41,19 +50,29 @@ hold on
 bode(G_iv_z)
 bode(Ci_z);
 bode(Li_z)
-hold off
 grid minor
 xlim([1, 1e5])
 title("current controller")
 legend(["G(z)", "C(z)", "L(z)"])
 
+en_d = 1;
+en_q = 0;
+
+iSd_step = 1;
+iSq_step = 0;
+
+[y_lin_i, tOut] = step(Ti_zz); 
+%out = sim("sim\IM_CurrentControllerDesign_vdqsat.slx");
+
 figure(2),clf
 hold on
-step(Ti_zz)
-step(Ti_z)
+plot(tOut, y_lin_i*iSd_step, 'LineWidth',1.3, 'Color','r')
+%plot(out.iSd, '-.', 'LineWidth', 1.3, 'Color','r')
+plot(tOut, y_lin_i*iSq_step, 'LineWidth',1.3, 'Color','g')
+%plot(out.iSq, '-.', 'LineWidth', 1.3, 'Color','g')
 hold off
 grid minor
-legend(["with delay", "without delay"])
+legend(["iSd linear system", "iSd with saturation", "iSq linear system", "iSq with saturation"])
 title("inner loop overall step response")
 
 ctrl.Ts = Ts;       % controller sampling time
@@ -61,15 +80,7 @@ ctrl.Ts = Ts;       % controller sampling time
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.i = GetCtrlForm4Lab(Ci_z, Ts);
 
-% save('tuned_controllers/std_controllers.mat', "ctrl")
-
-% cancel plant pole in continuous time to get starting point for tuning in
-% discrete time
-% Ci gains in continuous time
-% kIi = R_sigma;              % integral gain
-% kPi = R_sigma*Tau_sigma;    % proportional
-% Ci_s = kIi*1/s + kPi;
-% sisotool(G_iv_z, Ci_z, 1, 1);
+% save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 %% flux controller
 % use continuous time rule of thumb for starting
@@ -99,22 +110,30 @@ xlim([1, 1e5])
 title("flux controller")
 legend(["G(z)", "C(z)", "L(z)"])
 
-[y_lin_lambda, tOut] = step(T_lambda_z); 
-%out = sim("sim\IM_FluxController_Design.slx");
+en_lambda = 1;
+en_d = 1;
+en_q = 0;
+
+iSq_step = 10;
+t_iqstep = 0.1;
+
+[y_lin_lambda, tOut] = step(T_lambda_zz); 
+%out = sim("sim\IM_FluxControllerDesign_vdqsat.slx");
 
 figure(2),clf
 hold on
 plot(tOut, y_lin_lambda*lambda_Rd_ref, 'LineWidth',1.3)
-plot(out.lmbdaRd, '-.', 'LineWidth', 1.3)
+%plot(out.lmbdaRd, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
+xlim([0, tOut(end)])
 legend(["linear system", "with saturation"])
 title("flux loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
-ctrl.lambda = GetCtrlForm4Lab(C_lambda_z, Ts);
+ctrl.lambdar = GetCtrlForm4Lab(C_lambda_z, Ts);
 
-% save('tuned_controllers/std_controllers.mat', "ctrl")
+% save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 %% speed controller
 
@@ -148,21 +167,19 @@ G_omega_z = Ti_z * H_omega_z * F_speed_z;
 G_omega_z = minreal(G_omega_z);
 
 % get starting point of tuning by guessing (+ bode)
-%C_omega = GetPI4Tuning(2e-4, 1, Ts);
-C_omega.Gz = zpk(1-2.065e-05,1, 56.416, Ts); % seemed nice, PM ~ 57deg, tr ~ 30ms
+C_omega.Gz = zpk(1-7e-08, 1, 1.503, Ts); % wStepMax = 85rpm, to keep linear, for addendum params
 
-%sisotool(G_omega_z, C_omega.Gz, 1, 1);
 %sisotool(G_omega_z, C_omega.Gz, F_wq_z, 1); % consider dynamic of speed sensor
-C_omega_z = C_omega.Gz;
+C_omega_z = minreal(C_omega.Gz);
 
 
 % neglect time delay
 L_omega_z = G_omega_z*C_omega_z;  
-T_omega_z = minreal(L_omega_z/(1+L_omega_z)); %feedback();
+T_omega_z = minreal(feedback(L_omega_z, F_wq_z));
 
 % considers time delay due to converter
 L_omega_zz = L_omega_z * 1/z;
-T_omega_zz = minreal(L_omega_z/(1+L_omega_z)); %feedback();
+T_omega_zz = minreal(feedback(L_omega_zz, F_wq_z));
 
 
 figure(1),clf;
@@ -175,22 +192,13 @@ grid minor
 xlim([1, 1e5])
 title("speed controller")
 legend(["G(z)", "C(z)", "L(z)"])
+    
+w_amp = 1;%1000*pi/30;
+t_wstep = 0.12; % delay speed controller step to let flux controller settle 0.2
 
-w_amp = 1;
-t_wstep = 0.2; % delay speed controller step to let flux controller settle
-
-use_sat = 0;
-if(~use_sat)
-    im.vSmax = 1e9;
-    im.iSmax = 1e9;
-else
-    im.vSmax = 30;
-    im.iSmax = 55;
-end
-
-[y_lin_w, tOut] = step(T_omega_z);
+[y_lin_w, tOut] = step(T_omega_zz);
 tOut = tOut + t_wstep;
-out = sim("sim\IM_SpeedController_Design.slx");
+out = sim("sim\IM_SpeedController_Design_ivdqsat.slx");
 
 figure(2),clf
 hold on
@@ -202,9 +210,9 @@ legend(["linear system", "with saturation"])
 title("speed loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
-ctrl.omega = GetCtrlForm4Lab(C_omega_z, Ts);
+ctrl.w = GetCtrlForm4Lab(C_omega_z, Ts);
 
-%save('tuned_controllers/std_controllers.mat', "ctrl")
+%save('tuned_controllers/ourParams_w150ms.mat', "ctrl")
 
 
 function C = GetPI4Tuning(Tau, k, Ts)
@@ -223,5 +231,5 @@ function ctrl_s = GetCtrlForm4Lab(C_z, Ts)
     [b, ~] = tfdata(C_z, 'v');
     ctrl_s.k = b(1);                 % proportional gain
     ctrl_s.T = Ts*b(1)/(b(1)+b(2));  % integral time (TN)
-    ctrl_s.kb = Ts/ctrl_s.T;         % TODO: adjust that backcalc gain when model is ready
+    ctrl_s.kb = Ts/ctrl_s.T;                   % TODO: adjust that backcalc gain when model is ready
 end
