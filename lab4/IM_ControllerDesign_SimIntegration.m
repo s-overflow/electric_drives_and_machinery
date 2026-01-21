@@ -196,7 +196,7 @@ title("speed controller")
 legend(["G(z)", "C(z)", "L(z)"])
     
 en = 1; % enable
-w_amp =1000*pi/30;
+w_amp =100*pi/30;
 t_wstep = 0.12; % delay speed controller step to let flux controller settle 0.2
 
 [y_lin_w, tOut] = step(T_omega_zz);

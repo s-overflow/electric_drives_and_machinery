@@ -105,11 +105,11 @@ lambda_Rd_ref = 0.08; % [Vs] constant
 if(~exist('ctrl', 'var'))
     try
         if(use_measured_params)
-            load("../tuned_controllers/our_params.mat")
-            disp("Loaded controller for measured parameters from lab3")
-        else
             load("../tuned_controllers/rs_approved.mat")
-            disp("Loaded controller for proposed parameters from addendum")
+            disp("Loaded controllers used in lab3")
+        else
+            %load("../tuned_controllers/rs_approved.mat")
+            %disp("Loaded controller for proposed parameters from addendum")
         end
     catch
         warning("init script not called from its directory, controllers are not not being loaded")
