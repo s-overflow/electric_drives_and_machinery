@@ -55,14 +55,14 @@ bode(Ci_z);
 bode(Li_z)
 grid minor
 xlim([1, 1e5])
-title("current controller")
-legend(["G(z)", "C(z)", "L(z)"])
+%title("current controller")
+legend(["G_i(z)", "C_i(z)", "L_i(z)"])
 
 en_d = 1;
-en_q = 0;
+en_q = 1;
 
 iSd_step = 1;
-iSq_step = 0;
+iSq_step = 1;
 
 [y_lin_i, tOut] = step(Ti_zz); 
 out = sim("sim\IM_CurrentControllerDesign_vdqsat.slx");
@@ -75,8 +75,8 @@ stairs(tOut, y_lin_i*iSq_step, 'LineWidth',1.3, 'Color','g')
 plot(out.iSq, '-.', 'LineWidth', 1.3, 'Color','g')
 hold off
 grid minor
-legend(["iSd linear system", "iSd with saturation", "iSq linear system", "iSq with saturation"])
-title("inner loop overall step response")   
+legend(["iSd linear system", "sim: iSd with saturation", "iSq linear system", "sim: iSq with saturation"])
+%title("inner loop overall step response")    
 
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.i = GetCtrlForm4Lab(Ci_z, ctrl.Ts );
@@ -109,7 +109,8 @@ bode(L_lambda_z)
 hold off
 grid minor
 xlim([1, 1e5])
-title("flux controller")
+% title("flux controller")
+title("")
 legend(["G(z)", "C(z)", "L(z)"])
 
 en_lambda = 1;
@@ -128,9 +129,11 @@ plot(tOut, y_lin_lambda*lambda_Rd_ref, 'LineWidth',1.3)
 plot(out.lmbdaRd, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
+xlabel("t in s")
+ylabel("\lambda_{Rd} in Vs")
 xlim([0, tOut(end)])
-legend(["linear system", "with saturation"])
-title("flux loop overall step response")
+legend(["step: linear system", "sim: with saturation"])
+% title("flux loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.lambdar = GetCtrlForm4Lab(C_lambda_z, ctrl.Ts );
@@ -192,7 +195,8 @@ bode(L_omega_z)
 hold off
 grid minor
 xlim([1, 1e5])
-title("speed controller")
+%title("speed controller")
+title("")
 legend(["G(z)", "C(z)", "L(z)"])
     
 en = 1; % enable
@@ -209,8 +213,10 @@ plot(tOut, y_lin_w*w_amp, 'LineWidth',1.3)
 plot(out.w_hat, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
-legend(["linear system", "with saturation"])
-title("speed loop overall step response")
+xlabel("t in s")
+ylabel("\omega_{m} in 1/s")
+legend(["step: linear system", "sim: with saturation"])
+%title("speed loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
 ctrl.w = GetCtrlForm4Lab(C_omega_z, ctrl.Ts );
