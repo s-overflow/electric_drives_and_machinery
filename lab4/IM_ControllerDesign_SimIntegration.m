@@ -209,13 +209,14 @@ out = sim("sim\IM_SpeedController_Design_ivdqsat.slx");
 
 figure(2),clf
 hold on
+plot(out.w_ref, '-.', 'LineWidth', 1.3)
 plot(tOut, y_lin_w*w_amp, 'LineWidth',1.3)
-plot(out.w_hat, '-.', 'LineWidth', 1.3)
+plot(out.w, '-.', 'LineWidth', 1.3)
 hold off
 grid minor
 xlabel("t in s")
 ylabel("\omega_{m} in 1/s")
-legend(["step: linear system", "sim: with saturation"])
+legend(["reference signal","step: w\_hat linear system", "sim: w\_hat with saturation"])
 %title("speed loop overall step response")
 
 % time-discrete kP and Tn for controller in correct struct for lab
