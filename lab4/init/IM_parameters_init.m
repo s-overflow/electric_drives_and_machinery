@@ -89,7 +89,8 @@ Fw.w0=0; % rad/s, initial condition, but at t=t(0)-k*Ts
 % TODO: use actual current and voltage limits
 im.vDC = 124;   % V
 im.imax = 21.4; % A
-im.wmax = 4265*30/pi;   % 1/s
+% im.wmax = 4265*30/pi;   % 1/s
+im.wmax = 4265*pi/30;
 
 %% Plant transfer function
 
