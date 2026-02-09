@@ -112,7 +112,9 @@ if(~exist('ctrl', 'var'))
             %disp("Loaded controller for proposed parameters from addendum")
         end
     catch
-        warning("init script not called from its directory, controllers are not not being loaded")
+        load("tuned_controllers/rs_approved.mat")
+        disp("Loaded controllers used in lab3")
+        % warning("init script not called from its directory, controllers are not not being loaded")
     end
 end
     
