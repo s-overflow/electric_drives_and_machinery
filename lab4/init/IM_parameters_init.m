@@ -2,7 +2,7 @@
 % clc
 % close all
 
-Ts = 200*1e-6;   % switching period and sampling period of controller
+Ts = 2*1e-4;   % switching period and sampling period of controller
 
 s=tf('s');
 
